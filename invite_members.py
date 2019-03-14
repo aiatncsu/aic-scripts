@@ -1,4 +1,5 @@
 from github import Github
+from github import GithubException
 import sys
 # https://pygithub.readthedocs.io/en/latest/introduction.html
 
@@ -7,8 +8,13 @@ pw = sys.argv[2]
 member_emails = ['jacklynchtds@gmail.com']
 
 g = Github(uname, pw)
+aic = Github.get_organization(g, 'aiatncsu')
 
-member_ids = []
+print("getting members")
+#print(aic)
+#print(aic.get_members()[1])
+
+members = []
 
 for email in member_emails:
     query = email + ' in:email'
@@ -19,6 +25,13 @@ for email in member_emails:
     else:
         uname = unames[0]
 
-    member_ids.append(uname)
+    members.append(uname)
 
-print(member_ids)
+#print(members)
+
+for member in members:
+    try:
+        aic.invite_user(member)
+    except GithubException as e:
+        if e[1]['errors'][0]['message'] == 'Invitee is already a part of this org':
+            continue
